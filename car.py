@@ -1,11 +1,6 @@
-'''
-1.Anaconda promt -> scrapy startproject -name-
-2.Create spider in the project folder in spider folder
-3.Anaconda promt -> scrapy crawl -crawler_name- (In the example 'car')
-'''
 # -*- coding: utf-8 -*-
 """
-UPDATED on Wed Aug  1 21:36:53 2018
+Created on Wed Aug  1 21:36:53 2018
 
 @author: Cristi
 """
@@ -43,25 +38,25 @@ class Url_generator():
         return start_URLs
    # def page_number:
    #def url_gen(marca,moel,caroserie,an_inceput):
-       
+        
        
 #start_URLs = _build_base_url("volkswagen","passat","sedan","2002","3000","250000","2000")
 urls = Url_generator._build_base_url("volkswagen","passat","sedan","2002","3000","250000","2000")
 
-    
 #webbrowser.open(start_URLs[0])
 
 
     
 
 class CarSpider(scrapy.Spider):
+    start_urls = [urls[0]]
     name = "car"
-    def start_requests(self):
-            for url in urls:
-                yield scrapy.Request(url=url,callback = self.parse)
-                    
-    def parse(self,response):
-        filename = 'html_page.html'
-        with open(filename,'wb') as outfile:
-            outfile.write(response.body)
-            self.log('Saved file %s' % filename)
+    def parse(self, response ):
+        for car in response.css('article'):
+            yield {
+                'item': car.css('a.offer-title__link::text').extract()
+                }
+        
+            
+
+      
