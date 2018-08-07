@@ -4,7 +4,7 @@ Created on Wed Aug  1 21:36:53 2018
 
 @author: Cristi
 """
-
+import re
 import webbrowser
 import scrapy
 from scrapy.crawler import CrawlerProcess
@@ -46,17 +46,36 @@ urls = Url_generator._build_base_url("volkswagen","passat","sedan","2002","3000"
 #webbrowser.open(start_URLs[0])
 
 
-    
+
 
 class CarSpider(scrapy.Spider):
     start_urls = [urls[0]]
     name = "car"
     def parse(self, response ):
         for car in response.css('article'):
+         
+            raw_text = car.css('a.offer-title__link::text').extract()
+            full_car_name = raw_text[0].replace("\n","")
+            #re.sub(' +',' ',full_car_name)
+            full_car_name = " ".join(full_car_name.split())
+            car_split_name = full_car_name.split()
+            final_price = "".join(car.css('span.offer-price__number::text').extract()[0].split())
+            year = car.css('li.offer-item__params-item span::text').extract()[0]
+            millage = "".join(car.css('li.offer-item__params-item span::text').extract()[1].split()) 
+            engine_capacity = "".join(car.css('li.offer-item__params-item span::text').extract()[2].split())
+            fuel_type = car.css('li.offer-item__params-item span::text').extract()[3]
+            vehicle_location = "".join(car.css('span.offer-item__location h4::text').extract()[0].split())
+           # to_print = raw_text.split( )[0]
             yield {
-                'item': car.css('a.offer-title__link::text').extract()
+                'car': car_split_name,
+                'price' : final_price,
+                'year' : year,
+                'millage' : millage,
+                'engine_capacity' : engine_capacity,
+                'fuel_type' : fuel_type,
+                'location' : vehicle_location,
+                
                 }
-        
             
 
       
